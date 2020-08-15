@@ -1,0 +1,67 @@
+
+#include<Servo.h>
+int ldr1=A0;
+int ldr2=A1;
+int ldr3=A2;
+int ldr4=A3;
+
+Servo servo1;
+Servo servo2;
+
+int pos1=0;
+int pos2=0;
+int leftup=0;
+int rightup=0;
+int leftdown=0;
+int rightdown=0;
+
+void setup() {
+
+  servo1.attach(7);
+  servo2.attach(8);
+
+  //servo1.write(0);
+ // servo2.write(0);
+}
+
+void loop() {
+
+  pos1=servo1.read();
+  pos2=servo2.read();
+  
+  leftup=analogRead(ldr1);
+  rightup=analogRead(ldr2);
+  leftdown=analogRead(ldr3);
+  rightdown=analogRead(ldr4);
+  
+  if(rightup>leftup||rightdown>leftdown)
+  {
+    servo1.write(pos1+1);//right
+    delay(10);  
+  }
+  else if(rightup<leftup||rightdown<leftdown)
+  {
+    servo1.write(pos1-1);//left
+    delay(10);
+  }
+  else
+  {
+    servo1.write(pos1);
+  }
+
+  
+  if(leftup>leftdown||rightup>rightdown)
+  {
+    servo2.write(pos2+1);//upward
+    delay(10);
+  }
+  else if(leftup<leftdown||rightup<rightdown)
+  {
+    servo2.write(pos2-1);//downward
+    delay(10);  
+  }
+  else
+  {
+      servo2.write(pos2);
+  }
+}
