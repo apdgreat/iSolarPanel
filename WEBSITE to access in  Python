@@ -1,0 +1,87 @@
+#include <SPI.h>
+#include <Ethernet.h>
+
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; //physical mac address
+byte ip[] = { 192, 168, 0, 150 }; // IP address in LAN 
+byte gateway[] = { 192, 168, 0, 1 }; // internet access via router
+byte subnet[] = { 255, 255, 255, 0 }; //subnet mask
+EthernetServer server(80); //server port
+
+String readString;
+int motorPin = 2;
+
+void setup(){
+
+    pinMode(motorPin, OUTPUT); //pin selected to control
+    // Test Motor
+    digitalWrite(motorPin, HIGH); // set pin high
+    delay(500);
+    digitalWrite(motorPin, LOW); // set pin low
+   
+    //start Ethernet
+    Ethernet.begin(mac, ip, gateway, subnet);
+    server.begin();
+}
+
+void loop(){
+    // Create a client connection
+    EthernetClient client = server.available();
+    if (client) {
+        while (client.connected()) {
+            if (client.available()) {
+                char c = client.read();
+
+                //read char by char HTTP request
+                if (readString.length() < 100) {
+
+                    //store characters to string
+                    readString += c;
+                }
+
+                //if HTTP request has ended– 0x0D is Carriage Return \n ASCII
+                if (c == 0x0D) {
+                    client.println("HTTP/1.1 200 OK"); //send new page
+                    client.println("Content-Type: text/html");
+                    client.println();
+
+                    client.println("<HTML>");
+                    client.println("<HEAD>");
+                    client.println("<TITLE> Motor Control</TITLE>");
+                    client.println("</HEAD>");
+                    client.println("<BODY>");
+                    client.println("<hr>");
+                    client.println("<hr>");
+                    client.println("<br>");
+                    client.println("<H1 style=\"color:green;\">Motor Control with Arduino using WebPage</H1>");
+                    client.println("<hr>");
+                    client.println("<br>");
+
+                    client.println("<H2><a href=\"/?MOTORON\"\">Turn On Motor</a><br></H2>");
+                    client.println("<H2><a href=\"/?MOTOROFF\"\">Turn Off Motor</a><br></H2>");
+
+                    client.println("</BODY>");
+                    client.println("</HTML>");
+
+                    delay(10);
+                    //stopping client
+                    client.stop();
+
+                    // control arduino pin
+                    if(readString.indexOf("?MOTORON") > -1) //checks for MOTORON
+                    {
+                        digitalWrite(motorPin, HIGH); // set pin high
+                    }
+                    else{
+                        if(readString.indexOf("?MOTOROFF") > -1) //checks for MOTOROFF
+                        {
+                            digitalWrite(motorPin, LOW); // set pin low
+                        }
+                    }
+                    //clearing string for next read
+                    readString="";
+
+                }
+            }
+        }
+    }
+}
