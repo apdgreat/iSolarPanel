@@ -1,6 +1,5 @@
 # iSolarPanel
-Deloitte technoutsav challenge
-TEAM TECH_ISM
+
 INTRODUCTION TO THE PROBLEM
 
 Solar energy is the energy of the future. It is an important source of renewable energy and its technologies are broadly characterized as either passive solar or active solar depending on how they capture and distribute solar energy or convert it into solar power.
